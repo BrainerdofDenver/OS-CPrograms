@@ -27,10 +27,10 @@ int main(int argc,char *argv[]){
 	
 	else if(childP == 0){
 		childP = getpid();
-
+		
+		printf("\nFork successful");
 		printf("\nChild PID: %d\n", childP);
 		printf("\nParent PID: %d\n", ParentP);
-		printf("\nCall successful... ");
 		execl("./counter","counter","5",'\0');
 	}
 	else{
