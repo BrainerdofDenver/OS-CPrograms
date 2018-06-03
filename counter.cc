@@ -14,5 +14,6 @@ int main(int argc,char *argv[]){
 		printf("\nProcess: %d", currentPID);
 		printf(" %d", i, "\n\n");
 	}
+	printf("\nProcess: %d", currentPID, " exit ");
 	return parameter;
 }
