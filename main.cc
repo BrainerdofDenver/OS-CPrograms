@@ -31,7 +31,8 @@ int main(int argc,char *argv[]){
 		printf("\nFork successful");
 		printf("\nChild PID: %d\n", childP);
 		printf("\nParent PID: %d\n", ParentP);
-		execl("./counter","counter","5",'\0');
+		status = execl("./counter","counter","5",'\0');
+		printf("status: %d", status);
 	}
 	else{
 		ParentP = waitpid(childP, &status, WNOHANG);
