@@ -5,3 +5,9 @@
 #include <errno.h>
 #include <stdlib.h>
 
+int main( int argc, char argv*[]){
+  int     error_number, status;
+  pid_t   parent_id, child_id;
+  
+  struct sigaction action;
+}
