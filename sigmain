@@ -1,3 +1,5 @@
+//http://www.gnu.org/software/libc/manual/html_node/Sigaction-Function-Example.html
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -5,9 +7,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
-int main( int argc, char argv*[]){
-  int     error_number, status;
-  pid_t   parent_id, child_id;
-  
-  struct sigaction action;
+int main( int argc, char *argv[]){
+  int                 error_number, status;
+  pid_t               parent_id, child_id;
+  struct sigaction    action;
 }
