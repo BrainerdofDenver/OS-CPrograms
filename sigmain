@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void handler (int signum) {
   
@@ -14,8 +15,9 @@ void handler (int signum) {
 int main( int argc, char *argv[]){
   int                          error_number, status;
   pid_t                        parent_id, child_id;
-  extern struct sigaction      action;
-  
+  struct sigaction     	       action;
+  struct sigaction             *s_action = &action;
+ 
   action.sa_handler = handler;
   error_number = sigemptyset (&action.sa_mask);
   if (error_number < 0){
