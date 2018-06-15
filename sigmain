@@ -27,4 +27,5 @@ int main( int argc, char *argv[]){
     }
   s_action->sa_flags = SA_RESTART;
   
+  return 0;
 }
