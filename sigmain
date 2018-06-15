@@ -18,13 +18,13 @@ int main( int argc, char *argv[]){
   struct sigaction     	       action;
   struct sigaction             *s_action = &action;
  
-  action.sa_handler = handler;
+  s_action->sa_handler = handler;
   error_number = sigemptyset (&action.sa_mask);
   if (error_number < 0){
     printf ("\nError in call: sigemptyset");
     perror("sigemptyset");
     exit (EXIT_FAILURE);
     }
-  action.sa_flags = SA_RESTART;
+  s_action->sa_flags = SA_RESTART;
   
 }
