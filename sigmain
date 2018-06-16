@@ -9,8 +9,11 @@
 #include <stdio.h>
 
 void handler (int signum) {
-  
-}
+  if (signum == 01) {printf("\nFirst signal recieved");}
+  else if (signum == 10) {printf("\nSecond signal recieved");}
+//  else if 
+  }
+
 
 int main( int argc, char *argv[]){
   int                          error_number, status;
@@ -26,6 +29,8 @@ int main( int argc, char *argv[]){
     exit (EXIT_FAILURE);
     }
   s_action->sa_flags = SA_RESTART;
+  
+  
   
   return 0;
 }
