@@ -46,6 +46,14 @@ int main( int argc, char *argv[]){
 	printf("\nCall successful... ");
 	execl("./child","child",'\0','\0');
 	}
+	else{
+		parent_id = waitpid(child_id, &status, WNOHANG);
+		if(parent_id < 0){
+			printf("\nWait failed");
+			perror("waitpid");
+			exit(EXIT_FAILURE);
+		}
+	}
   
   return 0;
 }
