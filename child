@@ -1,0 +1,33 @@
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+int main(int argc,char *argv[]){
+	int p_id = argc;
+	int error;
+	
+	error = kill(p_id, SIGUSR1);
+	if (error < 0) {
+		perror ("kill");
+		printf("\nKill failed");
+		exit (EXIT_FAILURE);
+	}
+	error = kill(p_id, SIGUSR2);
+	if (error < 0) {
+		perror ("kill");
+		printf("\nKill failed");
+		exit (EXIT_FAILURE);
+	}
+	error = kill(p_id, SIGTRAP);
+	if (error < 0) {
+		perror ("kill");
+		printf("\nKill failed");
+		exit (EXIT_FAILURE);
+	}
+	return 0;
+	
+}
