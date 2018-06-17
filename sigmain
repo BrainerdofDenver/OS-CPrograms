@@ -7,30 +7,62 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
-void handler (int signum) {
-  if (signum == 01) {printf("\nFirst signal recieved");}
-  else if (signum == 10) {printf("\nSecond signal recieved");}
-//  else if 
-  }
-
+void handler_1 (int signum) {
+	assert(signum == SIGUSR1);
+	printf("\nFirst signal recieved");
+	}
+void handler_2 (int signum) {
+	assert(signum == SIGUSR2);
+	printf("\nSecond signal recieved");
+	}
+void handler_3 (int signum) {
+	assert(signum == SIGTRAP);
+	printf("\nThird signal recieved");
+	exit(0);
+	}
 
 int main( int argc, char *argv[]){
   int                          error_number, status;
   pid_t                        parent_id, child_id;
-  struct sigaction     	       action;
-  struct sigaction             *s_action = &action;
+  struct sigaction     	       action_1, action_2, action_3;
   
   parent_id = getpid();
- 
-  s_action->sa_handler = handler;
-  error_number = sigemptyset (&action.sa_mask);
+
+//Sigaction structure for the first handler   
+  struct sigaction *s_action = &action_1; 
+  s_action->sa_handler = handler_1;
+  error_number = sigemptyset (&action_1.sa_mask);
   if (error_number < 0){
     printf ("\nError in call: sigemptyset");
     perror("sigemptyset");
     exit (EXIT_FAILURE);
     }
   s_action->sa_flags = SA_RESTART;
+  
+//Sigaction structure for the second handler  
+  *s_action = action_2; 
+  s_action->sa_handler = handler_2;
+  error_number = sigemptyset (&action_2.sa_mask);
+  if (error_number < 0){
+    printf ("\nError in call: sigemptyset");
+    perror("sigemptyset");
+    exit (EXIT_FAILURE);
+    }
+  s_action->sa_flags = SA_RESTART;
+  
+//Sigaction structure for the third handler
+  *s_action = action_3; 
+  s_action->sa_handler = handler_3;
+  error_number = sigemptyset (&action_3.sa_mask);
+  if (error_number < 0){
+    printf ("\nError in call: sigemptyset");
+    perror("sigemptyset");
+    exit (EXIT_FAILURE);
+    }
+  s_action->sa_flags = SA_RESTART;  
+  
   
   child_id = fork();
   if (child_id < 0){
@@ -44,16 +76,20 @@ int main( int argc, char *argv[]){
 	printf("\nChild PID: %d\n", child_id);
 	printf("\nParent PID: %d\n", parent_id);
 	printf("\nCall successful... ");
-	execl("./child","child",'\0','\0');
+	execl("./child","child",parent_id,'\0');
+	_exit (EXIT_FAILURE);
 	}
-	else{
-		parent_id = waitpid(child_id, &status, WNOHANG);
-		if(parent_id < 0){
-			printf("\nWait failed");
-			perror("waitpid");
-			exit(EXIT_FAILURE);
+  else{
+	parent_id = waitpid(child_id, &status, WNOHANG);
+	if(parent_id < 0){
+		printf("\nWait failed");
+		perror("waitpid");
+		exit(EXIT_FAILURE);
 		}
 	}
+	
+  error_number = pause();
+	
   
   return 0;
 }
