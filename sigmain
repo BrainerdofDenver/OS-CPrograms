@@ -1,5 +1,3 @@
-//http://www.gnu.org/software/libc/manual/html_node/Sigaction-Function-Example.html
-
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -63,22 +61,22 @@ int main( int argc, char *argv[]){
     }
   s_action->sa_flags = SA_RESTART;  
   
-  
+//Fork a child process
   child_id = fork();
   if (child_id < 0){
       perror("fork");
       printf("\nChild is stillborn");
       exit(EXIT_FAILURE);
   }
+  
   else if(child_id == 0){
 	child_id = getpid();
-
 	printf("\nChild PID: %d\n", child_id);
 	printf("\nParent PID: %d\n", parent_id);
 	printf("\nCall successful... ");
-	execl("./child","child",parent_id,'\0');
-	_exit (EXIT_FAILURE);
+	execl("./child","child", parent_id, NULL);
 	}
+	
   else{
 	parent_id = waitpid(child_id, &status, WNOHANG);
 	if(parent_id < 0){
@@ -87,9 +85,6 @@ int main( int argc, char *argv[]){
 		exit(EXIT_FAILURE);
 		}
 	}
-	
-  error_number = pause();
-	
   
   return 0;
 }
