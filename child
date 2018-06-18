@@ -10,6 +10,9 @@ int main(int argc,char *argv[]){
 	int p_id = argc;
 	int error;
 	
+	printf("\nThe child process is running");
+	printf("\nThe parent ID passed is: %d", p_id);
+	
 	error = kill(p_id, SIGUSR1);
 	if (error < 0) {
 		perror ("kill");
