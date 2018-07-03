@@ -30,14 +30,14 @@ void *foo (void *bar)
 
     for (i = 0; i < *((int *) bar); i++)
     {
-		locker.lock(); //lock critical section
+		std::lock_guard<std::mutex> lock(locker);
         int tmp = i;
 
         if (tmp != i)
         {
             printf ("aargh: %d != %d\n", tmp, i);
         }
-		locker.unlock(); //unlock critical section
+		std::lock_guard<std::mutex> unlock(locker);
     }
 
     pthread_exit (me);
