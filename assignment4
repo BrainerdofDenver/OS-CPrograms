@@ -16,9 +16,9 @@
 */
 
 //referred to: http://www.cplusplus.com/reference/mutex/mutex/?kw=mutex
+// and https://stackoverflow.com/questions/32672784/c-understanding-multithreading-with-global-variables
 
 #define NUM_THREADS 2
-using namespace std;
 
 std::mutex locker; //A mutual exclusive object to lock and unlock
 				// a critical section
