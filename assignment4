@@ -18,10 +18,11 @@
 //referred to: http://www.cplusplus.com/reference/mutex/mutex/?kw=mutex
 
 #define NUM_THREADS 2
+using namespace std;
 
 std::mutex locker; //A mutual exclusive object to lock and unlock
 				// a critical section
-int i;
+volatile int i;
 
 void *foo (void *bar)
 {
@@ -30,14 +31,14 @@ void *foo (void *bar)
 
     for (i = 0; i < *((int *) bar); i++)
     {
-		std::lock_guard<std::mutex> lock(locker);
+		std::lock_guard<std::mutex> lock(locker); //Entering critical section
         int tmp = i;
-
+		
         if (tmp != i)
         {
             printf ("aargh: %d != %d\n", tmp, i);
         }
-		std::lock_guard<std::mutex> unlock(locker);
+		locker.unlock(); //Leaving critical section
     }
 
     pthread_exit (me);
