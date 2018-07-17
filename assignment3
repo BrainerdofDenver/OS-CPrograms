@@ -296,6 +296,30 @@ struct sigaction *create_handler(int signum, void(*handler)(int))
     return(action);
 }
 
+//*****************************************ADDED CODE***********************************
+void start_process() //Function to start processes from new_list
+{
+	if (!new_list.empty())
+	{
+		running = new_list.back();
+		new_list.pop_back();
+		if((running->pid = fork()) == 0)//Taken from your above code
+			{
+				pause();
+				perror("pause in start_process");
+			}
+		running->state = RUNNING;
+		running->ppid = getpid();
+		running->started = sys_time;
+		WRITES("New running/added to queue");
+	}
+	else 
+	{	
+		WRITES("/nFailure in start_process");
+		exit(EXIT_FAILURE);
+	}
+}
+
 void scheduler(int signum)
 {
     WRITES("---- entering scheduler\n");
@@ -422,29 +446,6 @@ PCB* add_PCB(char* process_element) //Function to create a process's PCB and add
    new_pcb->switches = 0;
    
    return new_pcb;
-}
-//*****************************************ADDED CODE***********************************
-void start_process() //Function to start processes from new_list
-{
-	if (!new_list.empty())
-	{
-		running = new_list.back();
-		new_list.pop_back();
-		if((running->pid = fork()) == 0)//Taken from your above code
-			{
-				pause();
-				perror("pause in start_process");
-			}
-		running->state = RUNNING;
-		running->ppid = getpid();
-		running->started = sys_time;
-		WRITES("New running/added to queue");
-	}
-	else 
-	{	
-		WRITES("/nFailure in start_process");
-		exit(EXIT_FAILURE);
-	}
 }
 
 int main(int argc, char **argv)
