@@ -138,6 +138,7 @@ struct PCB
 PCB *running;
 PCB *idle;
 PCB *tmp;
+PCB *new_pcb;
 
 // http://www.cplusplus.com/reference/list/list/
 list<PCB *> new_list;
@@ -299,7 +300,7 @@ struct sigaction *create_handler(int signum, void(*handler)(int))
 //*****************************************ADDED CODE***********************************
 void start_process() //Function to start processes from new_list
 {
-	if (!new_list.empty())
+	if (new_list.empty() != true)
 	{
 		running = new_list.back();
 		new_list.pop_back();
@@ -326,18 +327,26 @@ void scheduler(int signum)
     assert(signum == SIGALRM);
     sys_time++;
 
-	if (!new_list.empty())
+    PCB* tocont = idle;
+	
+	if (new_list.empty() != true)// Check if there are any new processes to exec
 	{
 		start_process();
 		processes.push_front(running);
 	}
-	
-	if (processes.back()->state == READY)
+	else if (processes.empty() != true)
 	{
+		if (processes.back()->state == READY)
+		{
+		 running = processes.back();
+		 running->state = RUNNING;
+		 WRITES("/nProcess running: ");
+		 WRITEI(running->pid);		 
+		 processes.pop_back();
+		 
+		}
 		
 	}
-    PCB* tocont = idle;
-
     WRITES("continuing");
     WRITEI(tocont->pid);
     WRITES("\n");
@@ -438,7 +447,6 @@ void create_idle()
 //*****************************************ADDED CODE***********************************
 PCB* add_PCB(char* process_element) //Function to create a process's PCB and add to new_list
 {
-   PCB *new_pcb;
    new_pcb = new(PCB);
    new_pcb->state = NEW;
    new_pcb->name = "&process_element";
@@ -450,7 +458,7 @@ PCB* add_PCB(char* process_element) //Function to create a process's PCB and add
 
 int main(int argc, char **argv)
 {	
-	if ( argc >= 2)
+	if ( argc > 1)
 	{
 		for (int i = 2; i <= argc; i++)
 		{
