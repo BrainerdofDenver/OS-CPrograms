@@ -304,8 +304,8 @@ void scheduler(int signum)
 
 	if (!new_list.empty())
 	{
-		tmp = start_process();
-		processes.push_front(tmp);
+		start_process();
+		processes.push_front(running);
 	}
 	
 	if (processes.back()->state == READY)
@@ -424,7 +424,7 @@ PCB* add_PCB(char* process_element) //Function to create a process's PCB and add
    return new_pcb;
 }
 //*****************************************ADDED CODE***********************************
-PCB* start_process() //Function to start processes from new_list
+void start_process() //Function to start processes from new_list
 {
 	if (!new_list.empty())
 	{
@@ -439,10 +439,12 @@ PCB* start_process() //Function to start processes from new_list
 		running->ppid = getpid();
 		running->started = sys_time;
 		WRITES("New running/added to queue");
-		return running;
 	}
-	if(running = running) WRITES("\nError in start_process function");
-	return running;//potentially problematic
+	else 
+	{	
+		WRITES("/nFailure in start_process");
+		exit(EXIT_FAILURE);
+	}
 }
 
 int main(int argc, char **argv)
