@@ -137,6 +137,7 @@ struct PCB
 
 PCB *running;
 PCB *idle;
+PCB *tmp;
 
 // http://www.cplusplus.com/reference/list/list/
 list<PCB *> new_list;
@@ -303,7 +304,7 @@ void scheduler(int signum)
 
 	if (!new_list.empty())
 	{
-		PCB* tmp = start_process();
+		tmp = start_process();
 		processes.push_front(tmp);
 	}
 	
