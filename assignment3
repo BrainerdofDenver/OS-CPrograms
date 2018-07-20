@@ -306,6 +306,7 @@ void start_process() //Function to start processes from new_list
 		new_list.pop_back();
 		if((running->pid = fork()) == 0)//Taken from your above code
 			{
+				assert(execl("./running->name",running->name,NULL));
 				pause();
 				perror("pause in start_process");
 			}
@@ -313,7 +314,7 @@ void start_process() //Function to start processes from new_list
 		running->ppid = getppid();
 		running->pid = getpid();
 		running->started = sys_time;
-		WRITES("New running/added to queue");
+		WRITES("New process found, running");
 	}
 	else 
 	{	
