@@ -307,12 +307,11 @@ void start_process() //Function to start processes from new_list
 		if((running->pid = fork()) == 0)//Taken from your above code
 			{
 				assert(execl("./running->name",running->name,NULL));
+				running->ppid = getpid();
 				pause();
 				perror("pause in start_process");
 			}
 		running->state = RUNNING;
-		running->ppid = getppid();
-		running->pid = getpid();
 		running->started = sys_time;
 		WRITES("New process found, running");
 	}
@@ -476,7 +475,7 @@ int main(int argc, char **argv)
 	
 	if ( argc > 1)//check if arguments passed
 	{
-		for (int i = 2; i <= argc; i++)//take executables and push to new_list
+		for (int i = 1; i <= argc; i++)//take executables and push to new_list
 		{
 			WRITES("Process ");
 			WRITES(argv[i]);
