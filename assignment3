@@ -359,6 +359,8 @@ void scheduler(int signum)
     WRITEI(tocont->pid);
     WRITES("\n");
 	
+    cout << running;
+	
     tocont->state = RUNNING;
     if(kill(tocont->pid, SIGCONT) == -1)
     {
@@ -477,7 +479,7 @@ int main(int argc, char **argv)
 		for (int i = 2; i <= argc; i++)//take executables and push to new_list
 		{
 			WRITES("Process ");
-			WRITES("&argv[i]");
+			WRITES(argv[i]);
 			WRITES(" added to new process list \n");
 			
 			new_list.push_front(add_PCB(argv[i]));
