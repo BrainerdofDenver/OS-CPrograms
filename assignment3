@@ -310,7 +310,8 @@ void start_process() //Function to start processes from new_list
 				perror("pause in start_process");
 			}
 		running->state = RUNNING;
-		running->ppid = getpid();
+		running->ppid = getppid();
+		running->pid = getpid();
 		running->started = sys_time;
 		WRITES("New running/added to queue");
 	}
@@ -327,7 +328,7 @@ void scheduler(int signum)
     assert(signum == SIGALRM);
     sys_time++;
 
-    PCB* tocont = idle;
+    PCB* tocont; //= idle;
 	
 	if (new_list.empty() != true)// Check if there are any new processes to exec
 	{
@@ -345,12 +346,18 @@ void scheduler(int signum)
 		 processes.pop_back();
 		 
 		}
-		
+/*		else 
+		{
+			//for(int i = processes.
+		}
+*/
 	}
+	tocont = running;
+
     WRITES("continuing");
     WRITEI(tocont->pid);
     WRITES("\n");
-
+	
     tocont->state = RUNNING;
     if(kill(tocont->pid, SIGCONT) == -1)
     {
@@ -458,9 +465,15 @@ PCB* add_PCB(char* process_element) //Function to create a process's PCB and add
 
 int main(int argc, char **argv)
 {	
-	if ( argc > 1)
+    boot();	
+	
+    create_idle();
+    running = idle;
+    cout << running;
+	
+	if ( argc > 1)//check if arguments passed
 	{
-		for (int i = 2; i <= argc; i++)
+		for (int i = 2; i <= argc; i++)//take executables and push to new_list
 		{
 			WRITES("Process ");
 			WRITES("&argv[i]");
@@ -470,11 +483,6 @@ int main(int argc, char **argv)
 		}
 	}
 	
-    boot();
-
-    create_idle();
-    running = idle;
-    cout << running;
 
     // we keep this process around so that the children don't die and
     // to keep the IRQs in place.
