@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <stdlib.h>
 
 /*Assignment 5
 Due date: Sunday, July 29, 2018, 11:55 PM
@@ -31,12 +32,15 @@ Please turn in two programs: CPU.cc and child.cc. Use child.cc to demonstrate ea
 
 #define READ 0
 #define WRITE 1
+#define SEND 3
+#define RECEIVE 4
 #define NUM_SECONDS 20
 #define ever ;;
 
-#define assertsyscall(x, y); if(!((x) y)){int err = errno; \
+#define assertsyscall(x, y) if(!((x) y)){int err = errno; \
     fprintf(stderr, "In file %s at line %d: ", __FILE__, __LINE__); \
-	perror(#x); exit(err);}
+        perror(#x); exit(err);}
+
 
 // http://man7.org/linux/man-pages/man7/signal-safety.7.html
 
@@ -58,9 +62,6 @@ Please turn in two programs: CPU.cc and child.cc. Use child.cc to demonstrate ea
 #endif
 
 using namespace std;
-int child_to_parent[2];
-int parent_to_child[2];
-int fl;
 
 enum STATE { NEW, RUNNING, WAITING, READY, TERMINATED };
 
@@ -73,13 +74,13 @@ struct PCB
     int interrupts;     // number of times interrupted
     int switches;       // may be < interrupts
     int started;        // the time this process started
+
+	int child2parent[2];
+	int parent2child[2];
+	int fl;
 	
-	//append PCB to include 2 pipes. used pipe.cc example for reference
-	assertsyscall(pipe(child_to_parent), == 0);
-	assertsyscall(pipe(parent_to_child), == 0);
-	assertsyscall(fl = fcntl(child_to_parent[READ], F_GETFL00), != -1);
-	assertsyscall(fcntl(child_to_parent[READ], F_SETFL, fl | O_NONBLOCK), == 0);
-	
+	//append PCB to include 2 pipes. Error: compiler not recognizing type
+
 };
 
 PCB *running;
@@ -262,6 +263,12 @@ void scheduler (int signum)
             front->interrupts = 0;
             front->switches = 0;
             front->started = sys_time;
+			
+			assertsyscall(pipe(front->child2parent), == 0);
+			assertsyscall(pipe(front->parent2child), == 0);
+			assertsyscall((front->fl = fcntl(front->child2parent[READ], F_GETFL)), != -1);
+			assertsyscall(fcntl(front->child2parent[READ], F_SETFL, front->fl | O_NONBLOCK), == 0);
+			
             running = front;
 
             assertsyscall((front->pid = fork()), >= 0);
@@ -269,6 +276,10 @@ void scheduler (int signum)
             {
 				//implement dup2 to establish communication line of child processes
 				//and close unusable ends of pipes
+				assertsyscall(close(front->child2parent[READ]), == 0);
+				assertsyscall(close(front->parent2child[WRITE]), == 0);
+				assertsyscall(dup2(front->child2parent[WRITE], SEND), != -1);
+				
                 execl(front->name, front->name, NULL);
                 perror("execl");
                 continue;
