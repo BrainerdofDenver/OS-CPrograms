@@ -74,17 +74,17 @@ struct PCB
     int interrupts;     // number of times interrupted
     int switches;       // may be < interrupts
     int started;        // the time this process started
-
+	
+	//append PCB to include 2 pipes.
 	int child2parent[2];
 	int parent2child[2];
 	int fl;
-	
-	//append PCB to include 2 pipes. Error: compiler not recognizing type
 
 };
 
 PCB *running;
 PCB *idle;
+PCB *check_pipe;
 
 // http://www.cplusplus.com/reference/list/list/
 list<PCB *> processes;
@@ -151,13 +151,22 @@ void(*ISV[32])(int) = {
 /* 30 */ bad, bad
 };
 
+// pipe request handler
+void pipe_request()
+{
+	for(int i = 0; i < processes.size(); i++)
+	{
+		
+	}
+}
+
 /*
 ** stop the running process and index into the ISV to call the ISR
 */
 void ISR (int signum)
 {
-    if (signum != SIGCHLD)
-    {
+    if (signum != (SIGCHLD))
+    {	
         assertsyscall (kill (running->pid, SIGSTOP), == 0);
         WRITES("In ISR stopped: ");
         WRITEI(running->pid);
@@ -165,6 +174,11 @@ void ISR (int signum)
         running->interrupts++;      // remove me
         running->state = READY;     // remove me
     }
+
+	if(signum == SIGTRAP)
+	{
+		pipe_request();
+	}
 
     ISV[signum](signum);
 }
@@ -229,6 +243,7 @@ void create_handler(int signum, struct sigaction action, void(*handler)(int))
     {
         action.sa_flags = SA_NOCLDSTOP | SA_RESTART;
     }
+
     else
     {
         action.sa_flags =  SA_RESTART;
@@ -274,11 +289,13 @@ void scheduler (int signum)
             assertsyscall((front->pid = fork()), >= 0);
             if (front->pid == 0)
             {
-				//implement dup2 to establish communication line of child processes
-				//and close unusable ends of pipes
+
+				//		close unusable ends of pipes
 				assertsyscall(close(front->child2parent[READ]), == 0);
 				assertsyscall(close(front->parent2child[WRITE]), == 0);
+				//		implement dup2 to establish communication line of child processes
 				assertsyscall(dup2(front->child2parent[WRITE], SEND), != -1);
+				assertsyscall(dup2(front->parent2child[READ], RECEIVE), != -1);
 				
                 execl(front->name, front->name, NULL);
                 perror("execl");
@@ -381,9 +398,11 @@ void boot()
     ISV[SIGALRM] = scheduler;
     ISV[SIGCHLD] = process_done;
 	// ISV to take sigtrap
+	//ISV[SIGTRAP] = pipe_request;
     create_handler(SIGALRM, alarm_handler, ISR);
     create_handler(SIGCHLD, child_handler, ISR);
 	//add handler for sigtrap
+	create_handler(SIGTRAP, trap_handler, ISR);
 
     // start up clock interrupt
     assertsyscall((timer = fork()), >= 0);
