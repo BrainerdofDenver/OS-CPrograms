@@ -88,9 +88,13 @@ PCB *check_pipe;
 
 // http://www.cplusplus.com/reference/list/list/
 list<PCB *> processes;
+std::list<PCB *>::iterator process_iterator = processes.begin();
 
 int sys_time;
 int timer;
+char buffer[8];
+int temp_message;
+
 struct sigaction alarm_handler;
 struct sigaction child_handler;
 struct sigaction trap_handler;
@@ -151,12 +155,40 @@ void(*ISV[32])(int) = {
 /* 30 */ bad, bad
 };
 
-// pipe request handler
-void pipe_request()
+// pipe request handler. used http://www.cplusplus.com/reference/list/list/begin/ example for reference
+int pipe_request()
 {
-	for(int i = 0; i < processes.size(); i++)
+	int message = 0;
+	for(; process_iterator != processes.end(); process_iterator++)
 	{
+		assertsyscall((message = read(RECEIVE,buffer, 1024)), != -1);
+		if (message != 0)
+		{
+			//check_pipe = 
+		}
+	}
+	process_iterator = processes.begin();
+	return message;
+}
+void send_message(int message_index)
+{
+	switch(message_index)
+	{
+		case 1:
 		
+		break;
+		
+		case 2:
+		
+		break;
+		
+		case 3:
+		
+		break;
+		
+		case 4:
+		
+		break;
 	}
 }
 
@@ -177,7 +209,8 @@ void ISR (int signum)
 
 	if(signum == SIGTRAP)
 	{
-		pipe_request();
+		temp_message = pipe_request();
+		
 	}
 
     ISV[signum](signum);
